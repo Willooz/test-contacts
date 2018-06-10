@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import update from 'immutability-helper';
 import { Layout, Form, Icon, Input, Button, List } from 'antd';
+import Contact from './Contact';
 
 import '../styles/App.css';
 
@@ -13,8 +14,10 @@ class App extends Component {
     this.state = {
       name: '',
       email: '',
-      contacts: [],
-      tags: []
+      contacts: [{
+        name: 'Willem Browne',
+        email: 'willem@epicbots.co'
+      }]
     };
   }
 
@@ -38,7 +41,7 @@ class App extends Component {
   }
 
   handleUpdateName = (name, index) => {
-    const contacts = update(this.state.contacts, { [index]: { name: { $set: name.target.value } } });
+    const contacts = update(this.state.contacts, { [index]: { name: { $set: name } } });
     this.setState({ contacts: contacts });
   }
 
@@ -59,10 +62,10 @@ class App extends Component {
           <h1 className="App-title">Contacts</h1>
         </Header>
         <Content style={{ padding: '0 50px' }}>
-          <h2 style={{ padding: '50PX 0 0 0' }}>Nouveau contact</h2>
+          <h2 style={{ padding: '50px 0 0 0' }}>Nouveau contact</h2>
           <Form layout="inline" onSubmit={this.handleSubmit}>
             <FormItem>
-              <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Name" name="name" value={this.state.name} onChange={this.handleChange} />
+              <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Nom" name="name" value={this.state.name} onChange={this.handleChange} />
             </FormItem>
             <FormItem>
               <Input prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Email" name="email" value={this.state.email} onChange={this.handleChange} />
@@ -77,19 +80,19 @@ class App extends Component {
             bordered
             dataSource={this.state.contacts}
             locale={{emptyText: 'Aucun contact'}}
-            renderItem={(item, index) => (<List.Item>
-              <Form layout="inline">
-                <FormItem>
-                  <Input value={item.name} onChange={(e) => this.handleUpdateName(e, index)} />
-                </FormItem>
-                <FormItem>
-                  <Input value={item.email} onChange={(e) => this.handleUpdateEmail(e, index)} />
-                </FormItem>
-                <FormItem>
-                  <Button type="danger" htmlType="submit" onClick={(e) => this.handleDeleteContact(e, index)}>Supprimer</Button>
-                </FormItem>
-              </Form>
-            </List.Item>)}
+            renderItem={(item, index) => {
+              const button = <Button type="danger" htmlType="submit" onClick={(e) => this.handleDeleteContact(e, index)}>Supprimer</Button>
+              return (
+                <List.Item actions={[button]}>
+                  <Contact
+                    index={index}
+                    name={item.name}
+                    email={item.email}
+                    onUpdateName={this.handleUpdateName}
+                    onUpdateEmail={this.handleUpdateEmail} />
+                </List.Item>
+              )
+            }}
           />
         </Content>
         <Footer>Footer</Footer>
@@ -100,8 +103,3 @@ class App extends Component {
 
 export default App;
 
-          // <ContactList
-          //   contacts={this.state.contacts}
-          //   onUpdateName={this.handleUpdateName}
-          //   onUpdateEmail={this.handleUpdateEmail}
-          //   onDeleteContact={this.handleDeleteContact}/>
